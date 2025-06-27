@@ -145,15 +145,27 @@ namespace LVCMod
 
         private async void OnWarped(object? sender, WarpedEventArgs e)
         {
+            string location = MergeLocations(e.NewLocation.Name);
+
             if (Context.IsMainPlayer)
             {
-                _ = HostBot.MoveToVoice(e.Player.UniqueMultiplayerID, e.NewLocation.Name);
+                _ = HostBot.MoveToVoice(e.Player.UniqueMultiplayerID, location);
                 return;
             }
 
-            (long, string) message = (e.Player.UniqueMultiplayerID, e.NewLocation.Name);
+            (long, string) message = (e.Player.UniqueMultiplayerID, location);
 
             SendMessageToMain(message, MessageTypes.PlayerWarped);
+        }
+
+        private static string MergeLocations(string currentLocation) {
+            if (currentLocation.Contains("UndergroundMine")) {
+                return currentLocation.Substring(0, currentLocation.Length - 1);
+            } else if (currentLocation == "FarmHouse") {
+                return "Cabin";
+            }
+
+            return currentLocation;
         }
 
         private async void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
